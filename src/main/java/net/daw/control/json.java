@@ -96,6 +96,38 @@ public class json extends HttpServlet {
 
                         }
                     }
+                    
+                    if (strOp.equalsIgnoreCase("create")) {
+
+                        TipousuarioService oService = new TipousuarioService(request);
+                        try {
+                            ReplyBean oReplyBean = oService.create();
+                            strJson = "{\"status\":" + oReplyBean.getStatus() + ",\"message\":" + oReplyBean.getJson()
+                                    + "}";
+
+                        } catch (Exception e) {
+                            strJson = "{\"status\":500,\"msg\":\"error en create: "
+                                    + EncodingHelper.escapeQuotes(EncodingHelper.escapeLine(e.getMessage())) + "\"}";
+                            e.printStackTrace();
+
+                        }
+                    }
+                    
+                    if (strOp.equalsIgnoreCase("update")) {
+
+                        TipousuarioService oService = new TipousuarioService(request);
+                        try {
+                            ReplyBean oReplyBean = oService.update();
+                            strJson = "{\"status\":" + oReplyBean.getStatus() + ",\"message\":" + oReplyBean.getJson()
+                                    + "}";
+
+                        } catch (Exception e) {
+                            strJson = "{\"status\":500,\"msg\":\"error en create: "
+                                    + EncodingHelper.escapeQuotes(EncodingHelper.escapeLine(e.getMessage())) + "\"}";
+                            e.printStackTrace();
+
+                        }
+                    }
 
                 }
                 if (strOb.equalsIgnoreCase("usuario")) {
@@ -157,7 +189,7 @@ public class json extends HttpServlet {
                 strJson = "{\"status\":200,\"msg\":\"operation empty\"}";
             }
         } else {
-            strJson = "{\"status\":200,\"msg\":\"operation can't be null}";
+            strJson = "{\"status\":200,\"msg\":\"operation & object(table) can't be null}";
         }
 
         response.getWriter().append(strJson).close();

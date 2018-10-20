@@ -88,5 +88,52 @@ public class TipousuarioService {
 		return oReplyBean;
 
 	}
+        
+        public ReplyBean create() throws Exception {
+		ReplyBean oReplyBean;
+		ConnectionInterface oConnectionPool = null;
+		Connection oConnection ;
+		try {
+			
+                        String desc = oRequest.getParameter("desc");
+			oConnectionPool = ConnectionFactory.getConnection(ConnectionConstants.connectionPool);
+			oConnection = oConnectionPool.newConnection();
+			TipousuarioDao oTipousuarioDao=new TipousuarioDao(oConnection);
+			TipousuarioBean oTipousuarioBean = oTipousuarioDao.create(desc);
+			Gson oGson = new Gson();
+			oReplyBean = new ReplyBean(200, oGson.toJson(oTipousuarioBean));
+		} catch (Exception ex) {
+			oReplyBean = new ReplyBean(500, "Bad Connection: " + EncodingHelper.escapeQuotes(EncodingHelper.escapeLine(ex.getMessage())));
+		} finally {
+			oConnectionPool.disposeConnection();
+		}
+
+		return oReplyBean;
+
+	}
+        
+        public ReplyBean update() throws Exception {
+		ReplyBean oReplyBean;
+		ConnectionInterface oConnectionPool = null;
+		Connection oConnection ;
+		try {
+			
+                        String desc = oRequest.getParameter("desc");
+                        int id = Integer.parseInt(oRequest.getParameter("id"));
+			oConnectionPool = ConnectionFactory.getConnection(ConnectionConstants.connectionPool);
+			oConnection = oConnectionPool.newConnection();
+			TipousuarioDao oTipousuarioDao=new TipousuarioDao(oConnection);
+			TipousuarioBean oTipousuarioBean = oTipousuarioDao.update(desc,id);
+			Gson oGson = new Gson();
+			oReplyBean = new ReplyBean(200, oGson.toJson(oTipousuarioBean));
+		} catch (Exception ex) {
+			oReplyBean = new ReplyBean(500, "Bad Connection: " + EncodingHelper.escapeQuotes(EncodingHelper.escapeLine(ex.getMessage())));
+		} finally {
+			oConnectionPool.disposeConnection();
+		}
+
+		return oReplyBean;
+
+	}
 
 }
