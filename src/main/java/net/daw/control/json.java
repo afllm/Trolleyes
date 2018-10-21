@@ -13,6 +13,7 @@ import net.daw.connection.publicinterface.ConnectionInterface;
 import net.daw.constant.ConnectionConstants;
 import net.daw.factory.ConnectionFactory;
 import net.daw.helper.EncodingHelper;
+import net.daw.helper.ValidationHelper;
 import net.daw.service.TipousuarioService;
 
 /**
@@ -41,6 +42,8 @@ public class json extends HttpServlet {
         String strJson = "";
         String strOb = request.getParameter("ob");
         String strOp = request.getParameter("op");
+        String strId = request.getParameter("id");
+        String strDs = request.getParameter("desc");
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -53,32 +56,42 @@ public class json extends HttpServlet {
                 if (strOb.equalsIgnoreCase("tipousuario")) {
                     if (strOp.equalsIgnoreCase("get")) {
 
-                        TipousuarioService oService = new TipousuarioService(request);
-                        try {
-                            ReplyBean oReplyBean = oService.get();
-                            strJson = "{\"status\":" + oReplyBean.getStatus() + ",\"message\":" + oReplyBean.getJson()
-                                    + "}";
+                        if (strId != null && !strId.equalsIgnoreCase("") && ValidationHelper.numPositivo(strId)) {
 
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            TipousuarioService oService = new TipousuarioService(request);
+                            try {
+                                ReplyBean oReplyBean = oService.get();
+                                strJson = "{\"status\":" + oReplyBean.getStatus() + ",\"message\":" + oReplyBean.getJson()
+                                        + "}";
 
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+
+                            }
+                        } else {
+                            strJson = "{\"status\":500,\"msg\":\"indique un 'id' válido\"}";
                         }
+
                     }
 
                     if (strOp.equalsIgnoreCase("remove")) {
+                        if (strId != null && !strId.equalsIgnoreCase("") && ValidationHelper.numPositivo(strId)) {
+                            TipousuarioService oService = new TipousuarioService(request);
+                            try {
+                                ReplyBean oReplyBean = oService.remove();
+                                strJson = "{\"status\":" + oReplyBean.getStatus() + ",\"message\":" + oReplyBean.getJson()
+                                        + "}";
 
-                        TipousuarioService oService = new TipousuarioService(request);
-                        try {
-                            ReplyBean oReplyBean = oService.remove();
-                            strJson = "{\"status\":" + oReplyBean.getStatus() + ",\"message\":" + oReplyBean.getJson()
-                                    + "}";
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
 
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-
+                            }
+                        } else {
+                            strJson = "{\"status\":500,\"msg\":\"indique un 'id' válido\"}";
                         }
+
                     }
 
                     if (strOp.equalsIgnoreCase("count")) {
@@ -96,37 +109,52 @@ public class json extends HttpServlet {
 
                         }
                     }
-                    
+
                     if (strOp.equalsIgnoreCase("create")) {
 
-                        TipousuarioService oService = new TipousuarioService(request);
-                        try {
-                            ReplyBean oReplyBean = oService.create();
-                            strJson = "{\"status\":" + oReplyBean.getStatus() + ",\"message\":" + oReplyBean.getJson()
-                                    + "}";
+                        if (strDs != null && !strDs.equalsIgnoreCase("")) {
+                            TipousuarioService oService = new TipousuarioService(request);
+                            try {
+                                ReplyBean oReplyBean = oService.create();
+                                strJson = "{\"status\":" + oReplyBean.getStatus() + ",\"message\":" + oReplyBean.getJson()
+                                        + "}";
 
-                        } catch (Exception e) {
-                            strJson = "{\"status\":500,\"msg\":\"error en create: "
-                                    + EncodingHelper.escapeQuotes(EncodingHelper.escapeLine(e.getMessage())) + "\"}";
-                            e.printStackTrace();
+                            } catch (Exception e) {
+                                strJson = "{\"status\":500,\"msg\":\"error en create: "
+                                        + EncodingHelper.escapeQuotes(EncodingHelper.escapeLine(e.getMessage())) + "\"}";
 
+                            }
+                        } else {
+                            strJson = "{\"status\":500,\"msg\":\"indique una descripción válida\"}";
                         }
+
                     }
-                    
+
                     if (strOp.equalsIgnoreCase("update")) {
 
-                        TipousuarioService oService = new TipousuarioService(request);
-                        try {
-                            ReplyBean oReplyBean = oService.update();
-                            strJson = "{\"status\":" + oReplyBean.getStatus() + ",\"message\":" + oReplyBean.getJson()
-                                    + "}";
+                        if (strId != null && !strId.equalsIgnoreCase("") && ValidationHelper.numPositivo(strId)) {
+                            if (strDs != null && !strDs.equalsIgnoreCase("")) {
 
-                        } catch (Exception e) {
-                            strJson = "{\"status\":500,\"msg\":\"error en create: "
-                                    + EncodingHelper.escapeQuotes(EncodingHelper.escapeLine(e.getMessage())) + "\"}";
-                            e.printStackTrace();
+                                TipousuarioService oService = new TipousuarioService(request);
+                                try {
+                                    ReplyBean oReplyBean = oService.update();
+                                    strJson = "{\"status\":" + oReplyBean.getStatus() + ",\"message\":" + oReplyBean.getJson()
+                                            + "}";
 
+                                } catch (Exception e) {
+                                    strJson = "{\"status\":500,\"msg\":\"error en create: "
+                                            + EncodingHelper.escapeQuotes(EncodingHelper.escapeLine(e.getMessage())) + "\"}";
+                                    e.printStackTrace();
+
+                                }
+                            } else {
+                                strJson = "{\"status\":500,\"msg\":\"indique una descripción válida\"}";
+                            }
+
+                        } else {
+                            strJson = "{\"status\":500,\"msg\":\"indique un 'id' válido\"}";
                         }
+
                     }
 
                 }
@@ -186,10 +214,10 @@ public class json extends HttpServlet {
                 }
 
             } else {
-                strJson = "{\"status\":200,\"msg\":\"operation empty\"}";
+                strJson = "{\"status\":500,\"msg\":\"operation empty\"}";
             }
         } else {
-            strJson = "{\"status\":200,\"msg\":\"operation & object(table) can't be null}";
+            strJson = "{\"status\":500,\"msg\":\"operation & object(table) can't be null}";
         }
 
         response.getWriter().append(strJson).close();

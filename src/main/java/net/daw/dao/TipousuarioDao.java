@@ -115,13 +115,13 @@ public class TipousuarioDao {
 
     public TipousuarioBean create(String desc) throws Exception {
 
-        String strSQL = "INSERT INTO `"+ob+"` (`desc`) VALUES (?)";
+        String strSQL = "INSERT INTO `" + ob + "` (`desc`) VALUES (?)";
         TipousuarioBean oTipousuarioBean = null;
         ResultSet oResultSet = null;
         PreparedStatement oPreparedStatement = null;
         try {
             oPreparedStatement = oConnection.prepareStatement(strSQL, Statement.RETURN_GENERATED_KEYS);
-            
+
             oPreparedStatement.setString(1, desc);
             int registros = oPreparedStatement.executeUpdate();
             if (registros == 1) {
@@ -153,30 +153,31 @@ public class TipousuarioDao {
 
     public TipousuarioBean update(String desc, int id) throws Exception {
 
-        String strSQL = "UPDATE `"+ob+"` SET `desc`= ? WHERE `id`= ?";
-        TipousuarioBean oTipousuarioBean = null;
-        ResultSet oResultSet = null;
+        String strSQL = "UPDATE `" + ob + "` SET `desc`= ? WHERE `id`= ?";
+        TipousuarioBean oTipousuarioBean = new TipousuarioBean();
         PreparedStatement oPreparedStatement = null;
-        try {
-            oPreparedStatement = oConnection.prepareStatement(strSQL);
-            oPreparedStatement.setString(1, desc);
-            oPreparedStatement.setInt(2, id);
-            int registros = oPreparedStatement.executeUpdate();
-            if (registros == 1) {
-                oTipousuarioBean = new TipousuarioBean();
-                oTipousuarioBean=this.get(id);
-            } else {
-                oTipousuarioBean.setId(404);
-                oTipousuarioBean.setDesc("Fallo en la consulta SQL");
-            }
-        } catch (SQLException e) {
-            throw new Exception("Error en Dao update de tipousuario: " + e.getMessage(), e);
-        } finally {
-            if (oResultSet != null) {
-                oResultSet.close();
-            }
-            if (oPreparedStatement != null) {
-                oPreparedStatement.close();
+
+        if (this.get(id) == null) {
+            oTipousuarioBean.setId(id);
+            oTipousuarioBean.setDesc("No existe");
+        } else {
+            try {
+                oPreparedStatement = oConnection.prepareStatement(strSQL);
+                oPreparedStatement.setString(1, desc);
+                oPreparedStatement.setInt(2, id);
+                int registros = oPreparedStatement.executeUpdate();
+                if (registros == 1) {
+                    oTipousuarioBean = this.get(id);
+                } else {
+                    oTipousuarioBean.setId(404);
+                    oTipousuarioBean.setDesc("Fallo en la consulta SQL");
+                }
+            } catch (SQLException e) {
+                throw new Exception("Error en Dao update de tipousuario: " + e.getMessage(), e);
+            } finally {
+                if (oPreparedStatement != null) {
+                    oPreparedStatement.close();
+                }
             }
         }
 
